@@ -13,7 +13,7 @@ class LocalMessenger {
   }
 
   bool isExistsConversations() {
-    return localConversation.isEmpty;
+    return localConversation.values.isNotEmpty;
   }
 
   Future<void> saveConversation(Conversation conversation) async {
