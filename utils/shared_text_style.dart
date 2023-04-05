@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class SharedTextStyle {
   //Size
+  static double LARGE_TITLE_SIZE = 30;
   static double TITLE_SIZE = 20;
   static double SUB_TITLE_SIZE = 16;
   static double NORMAL_SIZE = 14;
