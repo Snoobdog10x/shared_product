@@ -27,7 +27,7 @@ class EmailAuthentication {
     return await _emailAuth.sendOTP();
   }
 
-  Future<bool> verifyOTP(String otp) {
+  bool verifyOTP(String otp) {
     return _emailAuth.verifyOTP(otp: otp);
   }
 }
