@@ -1,158 +1,98 @@
 import 'dart:math';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 class EmailAuthentication {
-  _EmailOTP _emailAuth = _EmailOTP();
+  String _username = 'ttt.coop.mail@gmail.com';
+  String _password = 'hkeielzyvuukelut';
+  String _subject = "Verify your email for REEL T";
+  String? _randomOTP;
+  late SmtpServer _smtpServer;
   void init() {
-    _emailAuth.setSMTP(
-      host: "smtp.gmail.com",
-      auth: true,
-      username: "ttt.coop.mail@gmail.com",
-      password: "hkeielzyvuukelut",
-      secure: "SLL",
-      port: 587,
-    );
+    _smtpServer = gmail(_username, _password);
+  }
+
+  String generateOTP() {
+    var rng = Random();
+    var randomOTP = "";
+    for (var i = 0; i < 5; i++) {
+      randomOTP += rng.nextInt(10).toString();
+    }
+    _randomOTP = randomOTP;
+    return randomOTP;
   }
 
   Future<bool> sendOTP(String email) async {
-    _emailAuth.setConfig(
-      appName: "Reel T",
-      appEmail: "duythanh1565@gmail.com",
-      otpLength: 5,
-      otpType: OTPType.digitsOnly,
-      userEmail: email,
-    );
+    final message = Message()
+      ..from = Address(_username, 'REEL T')
+      ..recipients.add(email)
+      ..subject = _subject
+      ..html = _EmailTemplate.renderEmail(email, _randomOTP ?? "");
 
-    return await _emailAuth.sendOTP();
-  }
-
-  bool verifyOTP(String otp) {
-    return _emailAuth.verifyOTP(otp: otp);
-  }
-
-  void removeOTP() {
-    return _emailAuth.removeOTP();
+    try {
+      final sendReport = await send(message, _smtpServer);
+      print('Message sent: ' + sendReport.toString());
+      return true;
+    } on MailerException catch (e) {
+      print(e);
+      print('Message not sent.');
+      for (var p in e.problems) {
+        print('Problem: ${p.code}: ${p.msg}');
+      }
+      return false;
+    }
   }
 }
 
-enum OTPType { digitsOnly, stringOnly, mixed }
-
-class _EmailOTP {
-  /// Name of your application.
-  String? _appName;
-
-  /// Your email address.
-  String? _appEmail;
-
-  ///Email address of client, where you want to send OTP
-  String? _userEmail;
-
-  ///Will save correct OTP
-  String? _getOTP;
-
-  //Custom length for otp digits
-  int? _otpLength;
-
-  //Custom OTP Type
-  String? _type;
-
-  //SMTP Host Name
-  String? _host;
-
-  //SMTP Auth
-  bool? _auth;
-
-  //SMTP Username
-  String? _username;
-
-  //SMTP Password
-  String? _password;
-
-  //SMTP Secure
-  String? _secure;
-
-  //SMTP Port
-  int? _port;
-  void removeOTP() {
-    _getOTP = null;
-  }
-
-  //Function to set custom SMTP Configuration
-  void setSMTP({host, auth, username, password, secure, port}) {
-    _host = host;
-    _auth = auth;
-    _username = username;
-    _password = password;
-    _secure = secure;
-    _port = port;
-  }
-
-  ///Function use to config Email OTP
-  void setConfig({appName, appEmail, userEmail, otpLength, otpType}) {
-    _appName = appName;
-    _appEmail = appEmail;
-    _userEmail = userEmail;
-    _otpLength = otpLength;
-    switch (otpType) {
-      case OTPType.digitsOnly:
-        _type = "digits";
-        break;
-      case OTPType.stringOnly:
-        _type = "string";
-        break;
-      case OTPType.mixed:
-        _type = "mixed";
-        break;
-    }
-  }
-
-  ///Function will return true / false
-  Future<bool> sendOTP() async {
-    var url = Uri.parse('https://flutter.rohitchouhan.com/email-otpV2/v2.php');
-    Map<String, dynamic> body = {
-      "app_name": _appName,
-      "app_email": _appEmail,
-      "user_email": _userEmail,
-      "otp_length": _otpLength,
-      "type": _type,
-      "smtp_host": _host,
-      "smtp_auth": _auth,
-      "smtp_username": _username,
-      "smtp_password": _password,
-      "smtp_secure": _secure,
-      "smtp_port": _port
-    };
-    http.Response response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(body),
-    );
-    try {
-      if (response.statusCode == 200) {
-        String data = response.body;
-        var decodedData = jsonDecode(data);
-        if (decodedData['status'] == true) {
-          _getOTP = decodedData['otp'].toString();
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } catch (e) {
-      return false;
-    }
-  }
-
-  ///Function will return true / false
-  bool verifyOTP({otp}) {
-    if (_getOTP == otp) {
-      removeOTP();
-      return true;
-    } else {
-      return false;
-    }
+class _EmailTemplate {
+  static String renderEmail(String email, String otpCode) {
+    return """<table align="center" cellpadding="0" cellspacing="0" border="0" width="100%"bgcolor="#f0f0f0">
+        <tr>
+        <td style="padding: 30px 30px 20px 30px;">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#ffffff" style="max-width: 650px; margin: auto;">
+            <tr>
+                <td colspan="2" align="center" style="background-color: #333; padding: 40px;">
+                    <a href="http://wso2.com/" target="_blank"><img src="http://cdn.wso2.com/wso2/newsletter/images/nl-2017/wso2-logo-transparent.png" border="0" /></a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center" style="padding: 50px 50px 0px 50px;">
+                    <h1 style="padding-right: 0em; margin: 0; line-height: 40px; font-weight:300; font-family: 'Nunito Sans', Arial, Verdana, Helvetica, sans-serif; color: #666; text-align: left; padding-bottom: 1em;">
+                        REEL T ENTERTAINMENT
+                    </h1>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left; padding: 0px 50px;" valign="top">
+                    <p style="font-size: 18px; margin: 0; line-height: 24px; font-family: 'Nunito Sans', Arial, Verdana, Helvetica, sans-serif; color: #666; text-align: left; padding-bottom: 3%;">
+                        Hi $email,
+                    </p>
+                    <p style="font-size: 18px; margin: 0; line-height: 24px; font-family: 'Nunito Sans', Arial, Verdana, Helvetica, sans-serif; color: #666; text-align: left; padding-bottom: 3%;">
+                        Please use this one time password $otpCode to sign in to your application
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left; padding: 30px 50px 50px 50px" valign="top">
+                    <p style="font-size: 18px; margin: 0; line-height: 24px; font-family: 'Nunito Sans', Arial, Verdana, Helvetica, sans-serif; color: #505050; text-align: left;">
+                        Thanks,<br/>TTT Identity Server Team
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center" style="padding: 20px 40px 40px 40px;" bgcolor="#f0f0f0">
+                    <p style="font-size: 12px; margin: 0; line-height: 24px; font-family: 'Nunito Sans', Arial, Verdana, Helvetica, sans-serif; color: #777;">
+                        &copy; 2023
+                        <a href="http://wso2.com/" target="_blank" style="color: #777; text-decoration: none">TTT</a>
+                        <br>
+                        787 Castro Street, Mountain View, CA 94041.
+                    </p>
+                </td>
+            </tr>
+            </table>
+        </td>
+    </tr>
+</table>""";
   }
 }
