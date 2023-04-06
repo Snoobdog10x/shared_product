@@ -6,6 +6,6 @@ class FormatUtility {
   }
 
   static int getMillisecondsSinceEpoch() {
-    return FormatUtility.getMillisecondsSinceEpoch();
+    return DateTime.now().millisecondsSinceEpoch;
   }
 }
