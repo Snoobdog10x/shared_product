@@ -1,5 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:like_button/like_button.dart';
+import 'package:reel_t/shared_product/utils/format_utlity.dart';
+import 'package:reel_t/shared_product/utils/shared_text_style.dart';
 
 import '../../assets/icon/tik_tok_icons_icons.dart';
 import 'circle_image_animation.dart';
@@ -20,17 +23,17 @@ class ActionsToolbar extends StatelessWidget {
 // The size of the plus icon under the profile image in follow action
   static const double PlusIconSize = 20.0;
 
-  final String numLikes;
-  final String numComments;
+  final int numLikes;
+  final int numComments;
   final String userPic;
-  final Function? onTapFollow;
-  final Function? onTapLike;
-  final Function? onTapComment;
-  final Function? onTapShare;
+  final Future<bool?> Function(bool)? onTapFollow;
+  final Future<bool?> Function(bool)? onTapLike;
+  final Future<bool?> Function(bool)? onTapComment;
+  final Future<bool?> Function(bool)? onTapShare;
   final bool? isLiked;
   ActionsToolbar({
-    this.numLikes = "0",
-    this.numComments = "0",
+    this.numLikes = 0,
+    this.numComments = 0,
     this.userPic = "",
     this.isLiked = false,
     this.onTapFollow,
@@ -46,23 +49,31 @@ class ActionsToolbar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _getFollowAction(pictureUrl: userPic),
-          _getSocialAction(
+          SizedBox(height: 16),
+          buildAction(
             icon: TikTokIcons.heart,
-            title: numLikes,
+            title: "Love",
+            count: numLikes,
             onTap: onTapLike,
             isActive: isLiked!,
           ),
-          _getSocialAction(
+          SizedBox(height: 16),
+          buildAction(
             icon: TikTokIcons.chat_bubble,
-            title: numComments,
+            title: "0",
+            isChangeColor: false,
+            count: numComments,
             onTap: onTapComment,
           ),
-          _getSocialAction(
+          SizedBox(height: 16),
+          buildAction(
             icon: TikTokIcons.reply,
             title: 'Share',
-            isShare: true,
+            isChangeColor: false,
+            isShowTitle: true,
             onTap: onTapShare,
           ),
+          SizedBox(height: 16),
           CircleImageAnimation(
             child: _getMusicPlayerAction(userPic),
           ),
@@ -71,40 +82,42 @@ class ActionsToolbar extends StatelessWidget {
     );
   }
 
-  Widget _getSocialAction({
+  Widget buildAction({
     required String title,
+    int count = 0,
     required IconData icon,
     bool isActive = false,
-    bool isShare = false,
-    Function? onTap,
+    bool isChangeColor = true,
+    bool isShowTitle = false,
+    Future<bool?> Function(bool)? onTap,
   }) {
-    return GestureDetector(
-      onTap: () {
-        onTap?.call();
+    return LikeButton(
+      size: ActionIconSize,
+      likeBuilder: (bool isLiked) {
+        return Icon(
+          icon,
+          color: isLiked && isChangeColor
+              ? Colors.red
+              : Color.fromARGB(255, 232, 232, 232),
+          size: ActionIconSize,
+        );
       },
-      child: Container(
-        margin: EdgeInsets.only(top: 15.0),
-        width: 60.0,
-        height: 60.0,
-        child: Column(
-          children: [
-            Icon(icon,
-                size: isShare ? 25.0 : 35.0,
-                color: isActive ? Colors.red : Colors.white),
-            Padding(
-              padding: EdgeInsets.only(top: isShare ? 8.0 : 8.0),
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                  fontSize: isShare ? 14.0 : 14.0,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      likeCount: count,
+      likeCountAnimationType: LikeCountAnimationType.none,
+      countPostion: CountPostion.bottom,
+      isLiked: isActive,
+      onTap: onTap,
+      countBuilder: (count, isLiked, text) {
+        return Text(
+          count == 0 || isShowTitle
+              ? title
+              : FormatUtility.formatNumber(count!),
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: SharedTextStyle.NORMAL_SIZE,
+              fontWeight: SharedTextStyle.NORMAL_WEIGHT),
+        );
+      },
     );
   }
 
@@ -131,7 +144,7 @@ class ActionsToolbar extends StatelessWidget {
       left: ((ActionWidgetSize / 2) - (PlusIconSize / 2)),
       child: GestureDetector(
         onTap: () {
-          onTapFollow?.call();
+          onTapFollow?.call(true);
         },
         child: Container(
           width: PlusIconSize, // PlusIconSize = 20.0;
