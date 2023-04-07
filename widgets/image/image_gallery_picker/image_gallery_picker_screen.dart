@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 import '../../../../generated/abstract_bloc.dart';
 import '../../../../generated/abstract_state.dart';
@@ -31,11 +32,21 @@ class ImageGalleryPickerScreenState
   @override
   void onCreate() {
     bloc = ImageGalleryPickerBloc();
+    askPermission();
   }
 
   @override
   void onReady() {
     // TODO: implement onReady
+  }
+  Future<void> askPermission() async {
+    final PermissionState _ps = await PhotoManager.requestPermissionExtend();
+    if (_ps.isAuth) {
+      bloc.initImage();
+    } else {
+      // Limited(iOS) or Rejected, use `==` for more precise judgements.
+      // You can call `PhotoManager.openSetting()` to open settings for further steps.
+    }
   }
 
   @override
@@ -106,20 +117,34 @@ class ImageGalleryPickerScreenState
           mainAxisSpacing: 3,
           crossAxisSpacing: 3,
         ),
-        itemCount: 300,
+        itemCount: bloc.galleryImages.length,
         itemBuilder: (BuildContext context, int index) {
-          return buildImageBlock(index, true);
+          var image = bloc.galleryImages[index];
+          return GestureDetector(
+            onTap: () {
+              bloc.onSelectImage(image);
+            },
+            child: buildImageBlock(image),
+          );
         },
       ),
     );
   }
 
-  Widget buildImageBlock(int index, bool isSelected) {
+  Widget buildImageBlock(AssetEntity image) {
+    var isSelected = bloc.selectedImages.contains(image);
+    var index = bloc.selectedImages.indexOf(image);
     return Stack(
       children: [
         Container(
-          color: Colors.amber,
-          child: Center(child: Text('$index')),
+          width: screenWidth(),
+          height: screenHeight(),
+          child: Image(
+            fit: BoxFit.cover,
+            image: AssetEntityImageProvider(
+              image,
+            ),
+          ),
         ),
         if (isSelected) ...[
           Container(
