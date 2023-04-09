@@ -9,7 +9,10 @@ class LocalUser {
   String USER_PATH = UserProfile.PATH;
   String LOCAL_USER_KEY = "local_user_key";
   Future<void> init() async {
-    Hive.registerAdapter(UserProfileAdapter());
+    if (!Hive.isAdapterRegistered(0)) {
+      Hive.registerAdapter(UserProfileAdapter());
+    }
+
     _userBox = await Hive.openBox(USER_PATH);
   }
 
