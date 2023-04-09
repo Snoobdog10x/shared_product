@@ -198,6 +198,7 @@ class ActionsToolbar extends StatelessWidget {
           borderRadius: BorderRadius.circular(10000.0),
           child: CachedNetworkImage(
             imageUrl: userPic,
+            fit: BoxFit.cover,
             placeholder: (context, url) => new CircularProgressIndicator(),
             errorWidget: (context, url, error) => new Icon(Icons.error),
           ),
@@ -235,6 +236,7 @@ class ActionsToolbar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10000.0),
                   child: CachedNetworkImage(
                     imageUrl: userPic,
+                    fit: BoxFit.cover,
                     placeholder: (context, url) =>
                         new CircularProgressIndicator(),
                     errorWidget: (context, url, error) => new Icon(Icons.error),
