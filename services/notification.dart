@@ -3,18 +3,20 @@ import 'package:reel_t/models/conversation/conversation.dart';
 import 'package:platform_local_notifications/platform_local_notifications.dart';
 
 class Notification with StreamConversationsEvent {
-  late Function _notifyDataChanged;
   bool _isFirstConnect = true;
   Conversation? _latestConversation;
   bool _isShowNotify = true;
-  Future<void> init(String userId) async {
-    if (userId.isEmpty) return;
-    await PlatformNotifier.I.init(appName: "Reel T");
-    bool? isAccepted = await PlatformNotifier.I.requestPermissions();
+  Future<void> init(bool isWeb) async {
+    if (!isWeb) {
+      bool? isAccepted = await PlatformNotifier.I.requestPermissions();
+      if (isAccepted == null) return;
+      if (!isAccepted) return;
+    }
+  }
 
-    if (isAccepted == null) return;
-    if (!isAccepted) return;
-
+  void setNotificationStream(String userId) {
+    disposeStreamConversationsEvent();
+    _isFirstConnect = true;
     sendStreamConversationsEvent(userId);
   }
 
@@ -30,18 +32,10 @@ class Notification with StreamConversationsEvent {
     return _isShowNotify && _latestConversation != null;
   }
 
-  Conversation? getLatestConversation() {
-    if (hasNewNotification()) {
-      var tempConversation = _latestConversation;
-      _latestConversation = null;
-      return tempConversation;
-    }
-    return null;
-  }
-
   @override
   Future<void> onStreamConversationsEventDone(
       List<Conversation> updatedConversations) async {
+    if (updatedConversations.isEmpty) return;
     if (_isFirstConnect) {
       _isFirstConnect = false;
       return;

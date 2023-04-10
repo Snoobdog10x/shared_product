@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
+import 'package:reel_t/generated/app_init.dart';
 
 import '../../models/user_profile/user_profile.dart';
 import 'package:reel_t/shared_product/services/local_storage.dart';
@@ -33,13 +34,15 @@ class LocalUser {
     return _userBox.get(LOCAL_USER_KEY) != null;
   }
 
-  void login(UserProfile userProfile) {
+  Future<void> login(UserProfile userProfile) async {
     if (isLogin()) return;
-    _userBox.put(LOCAL_USER_KEY, userProfile);
+    await _userBox.put(LOCAL_USER_KEY, userProfile);
+    AppInit.appStore.setNotificationStream();
   }
 
-  void logout() {
+  Future<void> logout() async {
     if (!isLogin()) return;
-    _userBox.get(LOCAL_USER_KEY)!.delete();
+    await _userBox.get(LOCAL_USER_KEY)!.delete();
+    AppInit.appStore.setNotificationStream();
   }
 }
