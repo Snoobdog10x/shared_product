@@ -1,8 +1,11 @@
 import 'package:reel_t/events/message/stream_conversations/stream_conversations_event.dart';
+import 'package:reel_t/events/user/retrieve_user_profile/retrieve_user_profile_event.dart';
 import 'package:reel_t/models/conversation/conversation.dart';
 import 'package:platform_local_notifications/platform_local_notifications.dart';
+import 'package:reel_t/models/message/message.dart' as ms;
+import 'package:reel_t/models/user_profile/user_profile.dart';
 
-class Notification with StreamConversationsEvent {
+class Notification with StreamConversationsEvent, RetrieveUserProfileEvent {
   bool _isFirstConnect = true;
   Conversation? _latestConversation;
   bool _isShowNotify = true;
@@ -40,18 +43,25 @@ class Notification with StreamConversationsEvent {
       _isFirstConnect = false;
       return;
     }
-    await PlatformNotifier.I.showChatNotification(
-      model: ShowPluginNotificationModel(
-        id: DateTime.now().second,
-        title: "title",
-        body: "body",
-        payload: "test",
-      ),
-      userImage:
-          "https://thumbs.dreamstime.com/b/default-avatar-profile-vector-user-profile-default-avatar-profile-vector-user-profile-profile-179376714.jpg",
-      conversationTitle: "conversationTitle",
-      userName: "userName",
-    );
+
     _latestConversation = updatedConversations.last;
+    var message = ms.Message.fromStringJson(_latestConversation!.latestMessage);
+    sendRetrieveUserProfileEvent(message.userId);
+  }
+
+  @override
+  Future<void> onRetrieveUserProfileEventDone(e, UserProfile? userProfile,
+      [String? ConversationId]) async {
+    if (e != null) return;
+
+    var conversation = _latestConversation;
+    var message = ms.Message.fromStringJson(conversation!.latestMessage);
+    await PlatformNotifier.I.showPluginNotification(
+      ShowPluginNotificationModel(
+        id: DateTime.now().second,
+        title: "${userProfile!.userName} send you message",
+        body: message.content,
+      ),
+    );
   }
 }
