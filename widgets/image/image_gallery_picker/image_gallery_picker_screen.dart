@@ -3,7 +3,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 import '../../../../generated/abstract_bloc.dart';
 import '../../../../generated/abstract_state.dart';
-import '../../../utils/shared_text_style.dart';
+import '../../../utils/text/shared_text_style.dart';
 import 'image_gallery_picker_bloc.dart';
 import '../../default_appbar.dart';
 

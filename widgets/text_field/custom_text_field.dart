@@ -20,10 +20,66 @@ class CustomTextField extends StatefulWidget {
 class CustomTextFieldState extends State<CustomTextField> {
   bool isActive = false;
   bool obscureText = true;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   bool isObscureText() {
     if (!widget.isPasswordField) return false;
     if (!obscureText) return false;
     return true;
+  }
+
+  Widget buildNormalTextField() {
+    return TextField(
+      obscureText: isObscureText(),
+      decoration: InputDecoration(
+        hintText: widget.hintText,
+        hintStyle: TextStyle(fontSize: 16),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: isActive ? Colors.green : Colors.black,
+            width: 1,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            width: 1,
+            style: BorderStyle.none,
+          ),
+        ),
+        filled: true,
+        contentPadding: EdgeInsets.all(16),
+        suffixIcon: widget.isPasswordField
+            ? GestureDetector(
+                onTap: () {
+                  obscureText = !obscureText;
+                  setState(() {});
+                },
+                child: Icon(
+                  obscureText ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.grey,
+                ),
+              )
+            : null,
+      ),
+      controller: widget.controller,
+      cursorColor: Colors.green,
+      onTap: () {
+        isActive = true;
+        setState(() {});
+      },
+      onTapOutside: (event) {
+        FocusScope.of(context).unfocus();
+      },
+      onChanged: (value) {
+        widget.onTextChanged?.call(value);
+      },
+    );
   }
 
   @override

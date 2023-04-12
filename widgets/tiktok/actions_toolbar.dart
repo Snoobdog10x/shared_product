@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
-import 'package:reel_t/shared_product/utils/format_utlity.dart';
-import 'package:reel_t/shared_product/utils/shared_text_style.dart';
+import 'package:reel_t/shared_product/utils/format/format_utlity.dart';
+import 'package:reel_t/shared_product/utils/text/shared_text_style.dart';
 
 import '../../assets/icon/tik_tok_icons_icons.dart';
 import 'circle_image_animation.dart';
