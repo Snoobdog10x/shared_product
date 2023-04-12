@@ -8,10 +8,14 @@ import '../../models/video/video.dart';
 class VideoPlayerItem extends StatefulWidget {
   final String videoUrl;
   final bool isPlay;
+  final bool isMute;
+  final bool onTapPause;
   const VideoPlayerItem({
     super.key,
     required this.videoUrl,
     this.isPlay = false,
+    this.isMute = false,
+    this.onTapPause = true,
   });
 
   @override
@@ -23,7 +27,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
   @override
   void initState() {
     super.initState();
-    _initController(widget.isPlay);
+    _initController(widget.isPlay, widget.isMute);
   }
 
   @override
@@ -43,6 +47,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
   Widget buildReadyVideo() {
     return GestureDetector(
       onTap: () {
+        if (!widget.onTapPause) return;
         _changeVideoState();
       },
       child: VisibilityDetector(
@@ -54,14 +59,12 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
           _playVideo();
         },
         key: ObjectKey(this),
-        child: SizedBox.expand(
-          child: FittedBox(
-            fit: BoxFit.cover,
-            child: SizedBox(
-              width: _controller!.value.aspectRatio,
-              height: 1,
-              child: VideoPlayer(_controller!),
-            ),
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            height: _controller!.value.size.height,
+            width: _controller!.value.size.width,
+            child: VideoPlayer(_controller!),
           ),
         ),
       ),
@@ -78,19 +81,29 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
     );
   }
 
-  void _initController(bool isPlay) async {
+  void _initController(bool isPlay, bool isMute) async {
     if (_controller != null && _controller!.value.isInitialized) {
       return;
     }
+
     _controller = VideoPlayerController.network(widget.videoUrl);
     _controller!.addListener(() {
       notifyDataChanged();
     });
+
     _controller!.setLooping(true);
     await _controller!.initialize();
+
+    if (isMute) {
+      _controller!.setVolume(0);
+    }
+
     if (isPlay) {
       _controller!.play();
+    } else {
+      _controller!.pause();
     }
+
     notifyDataChanged();
   }
 
