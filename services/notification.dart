@@ -9,7 +9,7 @@ import 'package:reel_t/models/user_profile/user_profile.dart';
 
 class Notification with StreamConversationsEvent, RetrieveUserProfileEvent {
   bool _isFirstConnect = true;
-  AppStore _appStore = AppInit.appStore;
+  String _currentUserId = "";
   Conversation? _latestConversation;
   bool _isShowNotify = true;
   Future<void> init(bool isWeb) async {
@@ -23,7 +23,8 @@ class Notification with StreamConversationsEvent, RetrieveUserProfileEvent {
   void setNotificationStream(String userId) {
     disposeStreamConversationsEvent();
     _isFirstConnect = true;
-    sendStreamConversationsEvent(userId);
+    _currentUserId = userId;
+    sendStreamConversationsEvent(_currentUserId);
   }
 
   void turnOffNotification() {
@@ -59,12 +60,12 @@ class Notification with StreamConversationsEvent, RetrieveUserProfileEvent {
 
     var conversation = _latestConversation;
     var message = ms.Message.fromStringJson(conversation!.latestMessage);
-    if (message.userId == _appStore.localUser.getCurrentUser().id) return;
-    
+    if (message.userId == _currentUserId) return;
+
     await PlatformNotifier.I.showPluginNotification(
       ShowPluginNotificationModel(
         id: DateTime.now().second,
-        title: "${userProfile!.userName} send you message",
+        title: "${userProfile!.fullName} send you message",
         body: message.content,
       ),
     );
