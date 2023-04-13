@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
@@ -30,12 +32,14 @@ class ActionsToolbar extends StatelessWidget {
   final Future<bool?> Function(bool)? onTapLike;
   final Future<bool?> Function(bool)? onTapComment;
   final Future<bool?> Function(bool)? onTapShare;
-  final bool? isLiked;
+  final bool isLiked;
+  bool isFollow;
   ActionsToolbar({
     this.numLikes = 0,
     this.numComments = 0,
     this.userPic = "",
     this.isLiked = false,
+    this.isFollow = false,
     this.onTapFollow,
     this.onTapShare,
     this.onTapComment,
@@ -139,26 +143,32 @@ class ActionsToolbar extends StatelessWidget {
   }
 
   Widget _getPlusIcon() {
-    return Positioned(
-      bottom: 0,
-      left: ((ActionWidgetSize / 2) - (PlusIconSize / 2)),
-      child: GestureDetector(
-        onTap: () {
-          onTapFollow?.call(true);
-        },
-        child: Container(
-          width: PlusIconSize, // PlusIconSize = 20.0;
-          height: PlusIconSize, // PlusIconSize = 20.0;
-          decoration: BoxDecoration(
-              color: Color.fromARGB(255, 255, 43, 84),
-              borderRadius: BorderRadius.circular(15.0)),
-          child: Icon(
-            Icons.add,
-            color: Colors.white,
-            size: 20.0,
+    return StatefulBuilder(
+      builder: (BuildContext context, void Function(void Function()) setState) {
+        return Positioned(
+          bottom: 0,
+          left: ((ActionWidgetSize / 2) - (PlusIconSize / 2)),
+          child: GestureDetector(
+            onTap: () async {
+              isFollow = !isFollow;
+              setState(() {});
+              await onTapFollow?.call(isFollow);
+            },
+            child: Container(
+              width: PlusIconSize, // PlusIconSize = 20.0;
+              height: PlusIconSize, // PlusIconSize = 20.0;
+              decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 255, 43, 84),
+                  borderRadius: BorderRadius.circular(15.0)),
+              child: Icon(
+                !isFollow ? Icons.add : Icons.check,
+                color: Colors.white,
+                size: 20.0,
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
