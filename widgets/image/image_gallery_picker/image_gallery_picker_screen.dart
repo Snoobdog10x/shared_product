@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +10,13 @@ import 'image_gallery_picker_bloc.dart';
 import '../../default_appbar.dart';
 
 class ImageGalleryPickerScreen extends StatefulWidget {
-  const ImageGalleryPickerScreen({super.key});
+  final bool isPickMultiple;
+  final void Function(List<File?>)? onFileSelected;
+  const ImageGalleryPickerScreen({
+    super.key,
+    this.isPickMultiple = true,
+    this.onFileSelected,
+  });
 
   @override
   State<ImageGalleryPickerScreen> createState() =>
@@ -18,7 +26,7 @@ class ImageGalleryPickerScreen extends StatefulWidget {
 class ImageGalleryPickerScreenState
     extends AbstractState<ImageGalleryPickerScreen> {
   late ImageGalleryPickerBloc bloc;
-  int pickNum = 0;
+
   @override
   AbstractBloc initBloc() {
     return bloc;
@@ -57,7 +65,11 @@ class ImageGalleryPickerScreenState
         return Consumer<ImageGalleryPickerBloc>(
           builder: (context, value, child) {
             var body = buildBody();
-            return buildScreen(body: body, isSafe: false);
+            return buildScreen(
+              body: body,
+              isSafe: false,
+              appBar: buildAppBar(),
+            );
           },
         );
       },
@@ -65,16 +77,12 @@ class ImageGalleryPickerScreenState
   }
 
   Widget buildBody() {
+    if (!widget.isPickMultiple) return buildGridImages();
     return Container(
       child: Stack(
         children: [
-          Column(
-            children: [
-              buildAppbar(),
-              Expanded(child: buildGridImages()),
-            ],
-          ),
-          buildSendButton()
+          buildGridImages(),
+          buildSendButton(),
         ],
       ),
     );
@@ -94,7 +102,7 @@ class ImageGalleryPickerScreenState
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            "Send $pickNum",
+            "Send ${bloc.selectedImages.length}",
             style: TextStyle(
               fontSize: SharedTextStyle.SUB_TITLE_SIZE,
               fontWeight: SharedTextStyle.SUB_TITLE_WEIGHT,
@@ -121,7 +129,13 @@ class ImageGalleryPickerScreenState
         itemBuilder: (BuildContext context, int index) {
           var image = bloc.galleryImages[index];
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
+              if (!widget.isPickMultiple) {
+                bloc.selectedImages.add(image);
+                widget.onFileSelected?.call(await bloc.getSelectedFiles());
+                popTopDisplay();
+                return;
+              }
               bloc.onSelectImage(image);
             },
             child: buildImageBlock(image),
@@ -146,7 +160,7 @@ class ImageGalleryPickerScreenState
             ),
           ),
         ),
-        if (isSelected) ...[
+        if (isSelected && widget.isPickMultiple) ...[
           Container(
             alignment: Alignment.center,
             color: Colors.white.withOpacity(0.4),
@@ -159,7 +173,7 @@ class ImageGalleryPickerScreenState
                 color: Colors.blueAccent,
               ),
               child: Text(
-                index.toString(),
+                (index + 1).toString(),
                 style: TextStyle(
                   fontSize: SharedTextStyle.SUB_TITLE_SIZE,
                   fontWeight: SharedTextStyle.SUB_TITLE_WEIGHT,
@@ -173,9 +187,48 @@ class ImageGalleryPickerScreenState
     );
   }
 
-  Widget buildAppbar() {
-    return Column(
-      children: [],
+  Widget buildAppBar() {
+    if (widget.isPickMultiple) {
+      return DefaultAppBar(
+        tapBackIcon: Icons.close,
+        onTapBackButton: () {
+          popTopDisplay();
+        },
+        appBarTitle: "Pick images",
+        appBarAction: GestureDetector(
+          onTap: () async {
+            widget.onFileSelected?.call(await bloc.getSelectedFiles());
+            popTopDisplay();
+          },
+          child: Text(
+            "OK",
+          ),
+        ),
+      );
+    }
+
+    return DefaultAppBar(
+      appBarTitle: "Pick an image",
+      appBarAction: GestureDetector(
+        onTap: () {
+          print("click");
+          popTopDisplay();
+        },
+        child: Container(
+          alignment: Alignment.centerRight,
+          child: Container(
+            height: 35,
+            width: 35,
+            alignment: Alignment.center,
+            decoration:
+                BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            child: Icon(
+              Icons.close,
+              size: 20,
+            ),
+          ),
+        ),
+      ),
     );
   }
 

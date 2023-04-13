@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:photo_manager/photo_manager.dart';
 
 import '../../../../generated/abstract_bloc.dart';
@@ -13,6 +16,15 @@ class ImageGalleryPickerBloc
     galleryImages =
         await PhotoManager.getAssetListPaged(page: page, pageCount: limit);
     notifyDataChanged();
+  }
+
+  Future<List<File?>> getSelectedFiles() async {
+    List<Future<File?>> getFile = [];
+    selectedImages.forEach((element) {
+      getFile.add(element.originFile);
+    });
+
+    return await Future.wait(getFile);
   }
 
   void onSelectImage(AssetEntity image) {
