@@ -32,6 +32,7 @@ class ActionsToolbar extends StatelessWidget {
   final Future<bool?> Function(bool)? onTapLike;
   final Future<bool?> Function(bool)? onTapComment;
   final Future<bool?> Function(bool)? onTapShare;
+  final void Function()? onTapAvatar;
   final bool isLiked;
   bool isFollow;
   ActionsToolbar({
@@ -44,6 +45,7 @@ class ActionsToolbar extends StatelessWidget {
     this.onTapShare,
     this.onTapComment,
     this.onTapLike,
+    this.onTapAvatar,
   });
   @override
   Widget build(BuildContext context) {
@@ -126,18 +128,15 @@ class ActionsToolbar extends StatelessWidget {
   }
 
   Widget _getFollowAction({required String pictureUrl}) {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 10.0),
-        width: 60.0,
-        height: 60.0,
-        child: Stack(
-          children: [
-            _getProfilePicture(pictureUrl),
-            _getPlusIcon(),
-          ],
-        ),
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10.0),
+      width: 60.0,
+      height: 60.0,
+      child: Stack(
+        children: [
+          _getProfilePicture(pictureUrl),
+          _getPlusIcon(),
+        ],
       ),
     );
   }
@@ -173,9 +172,12 @@ class ActionsToolbar extends StatelessWidget {
   }
 
   Widget _getProfilePicture(userPic) {
-    if (userPic.isEmpty) {
-      return Positioned(
-        left: (ActionWidgetSize / 2) - (ProfileImageSize / 2),
+    return Positioned(
+      left: (ActionWidgetSize / 2) - (ProfileImageSize / 2),
+      child: GestureDetector(
+        onTap: () {
+          onTapAvatar?.call();
+        },
         child: Container(
           padding:
               EdgeInsets.all(1.0), // Add 1.0 point padding to create border
@@ -186,31 +188,19 @@ class ActionsToolbar extends StatelessWidget {
               borderRadius: BorderRadius.circular(ProfileImageSize / 2)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10000.0),
-            child: Icon(
-              Icons.people_alt,
-              size: ProfileImageSize,
-              color: Colors.grey[300],
-            ),
-          ),
-        ),
-      );
-    }
-    return Positioned(
-      left: (ActionWidgetSize / 2) - (ProfileImageSize / 2),
-      child: Container(
-        padding: EdgeInsets.all(1.0), // Add 1.0 point padding to create border
-        height: ProfileImageSize, // ProfileImageSize = 50.0;
-        width: ProfileImageSize, // ProfileImageSize = 50.0;
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(ProfileImageSize / 2)),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10000.0),
-          child: CachedNetworkImage(
-            imageUrl: userPic,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => new CircularProgressIndicator(),
-            errorWidget: (context, url, error) => new Icon(Icons.error),
+            child: userPic.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: userPic,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        new CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => new Icon(Icons.error),
+                  )
+                : Icon(
+                    Icons.people_alt,
+                    size: ProfileImageSize,
+                    color: Colors.grey[300],
+                  ),
           ),
         ),
       ),
