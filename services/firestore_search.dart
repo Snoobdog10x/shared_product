@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreSearch {
@@ -6,7 +8,7 @@ class FirestoreSearch {
     return collectionPaths.split("/");
   }
 
-  Stream? searchStream({
+  StreamSubscription<QuerySnapshot<Object?>> searchStream({
     String collectionPaths = "",
     String searchByPath = "",
     String searchText = "",
@@ -25,13 +27,12 @@ class FirestoreSearch {
       collectionRef = collectionRef.doc(path);
     }
 
-    (collectionRef as CollectionReference)
+    return (collectionRef as CollectionReference)
         .orderBy(searchByPath, descending: false)
         .where(searchByPath, isGreaterThanOrEqualTo: searchText)
         .where(searchByPath, isLessThan: searchText + 'z')
         .limit(limitPerSearch)
         .snapshots()
-        // .map(dataListFromSnapshot!);
-    ;
+        .listen((event) {});
   }
 }
