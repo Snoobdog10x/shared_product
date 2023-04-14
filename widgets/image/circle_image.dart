@@ -12,6 +12,22 @@ class CircleImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (imageUrl.isEmpty)
+      return Container(
+        width: radius,
+        height: radius,
+        decoration: new BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white,
+        ),
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.people,
+          color: Colors.black,
+          size: 30,
+        ),
+      );
+
     return new Container(
       width: radius,
       height: radius,

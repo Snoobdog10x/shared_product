@@ -59,7 +59,10 @@ class Notification with StreamConversationsEvent, RetrieveUserProfileEvent {
     if (e != null) return;
 
     var conversation = _latestConversation;
-    var message = ms.Message.fromStringJson(conversation!.latestMessage);
+    var message;
+    if (conversation!.latestMessage.isNotEmpty)
+      message = ms.Message.fromStringJson(conversation.latestMessage);
+    if (message == null) return;
     if (message.userId == _currentUserId) return;
 
     await PlatformNotifier.I.showPluginNotification(
