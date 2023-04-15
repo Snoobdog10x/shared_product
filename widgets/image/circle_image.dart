@@ -24,7 +24,7 @@ class CircleImage extends StatelessWidget {
         child: Icon(
           Icons.people,
           color: Colors.black,
-          size: 30,
+          size: radius / 2,
         ),
       );
 
