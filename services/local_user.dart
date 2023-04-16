@@ -26,6 +26,11 @@ class LocalUser {
     return _currentProfile!;
   }
 
+  bool isUserSignUpByGoogle() {
+    if (!isLogin()) return false;
+    return getCurrentUser().isSignUpByGoogle;
+  }
+
   void clearUser() {
     _userBox.clear();
   }
