@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 import '../../models/user_profile/user_profile.dart';
 
 class LocalUser {
+  UserProfile? _currentProfile;
   late Box<UserProfile> _userBox;
   String USER_PATH = UserProfile.PATH;
   String LOCAL_USER_KEY = "local_user_key";
@@ -17,11 +18,12 @@ class LocalUser {
 
   UserProfile getCurrentUser() {
     if (!isLogin()) {
-      return UserProfile(fullName: "Guest");
+      _currentProfile = UserProfile(fullName: "Guest");
+      return _currentProfile!;
     }
 
-    var currentUser = _userBox.get(LOCAL_USER_KEY)!;
-    return currentUser;
+    _currentProfile = _userBox.get(LOCAL_USER_KEY)!;
+    return _currentProfile!;
   }
 
   void clearUser() {
@@ -37,6 +39,6 @@ class LocalUser {
   }
 
   Future<void> logout() async {
-    clearUser();
+    _userBox.delete(LOCAL_USER_KEY);
   }
 }
