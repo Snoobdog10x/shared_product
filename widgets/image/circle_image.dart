@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 class CircleImage extends StatelessWidget {
   final String imageUrl;
   final double radius;
+  final Color background;
   const CircleImage(
     this.imageUrl, {
     super.key,
     this.radius = 20,
+    this.background = Colors.white,
   });
 
   @override
@@ -18,7 +20,7 @@ class CircleImage extends StatelessWidget {
         height: radius,
         decoration: new BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white,
+          color: background,
         ),
         alignment: Alignment.center,
         child: Icon(

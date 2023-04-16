@@ -33,7 +33,7 @@ class LocalSetting with RetrieveUserSettingEvent {
 
     return userSetting;
   }
-
+  
   @override
   void onRetrieveUserSettingEventDone(Setting? setting) {
     if (setting != null) setUserSetting(setting);

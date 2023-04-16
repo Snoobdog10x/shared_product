@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:hive/hive.dart';
 
 import '../../models/user_profile/user_profile.dart';
@@ -6,7 +8,7 @@ class LocalUser {
   UserProfile? _currentProfile;
   late Box<UserProfile> _userBox;
   String USER_PATH = UserProfile.PATH;
-  String LOCAL_USER_KEY = "local_user_key";
+  String CURRENT_LOGGED_USER = "current_logged_user";
   Future<void> init() async {
     var userAdapter = UserProfileAdapter();
     if (!Hive.isAdapterRegistered(userAdapter.typeId)) {
@@ -22,7 +24,7 @@ class LocalUser {
       return _currentProfile!;
     }
 
-    _currentProfile = _userBox.get(LOCAL_USER_KEY)!;
+    _currentProfile = _userBox.get(CURRENT_LOGGED_USER)!;
     return _currentProfile!;
   }
 
@@ -31,19 +33,44 @@ class LocalUser {
     return getCurrentUser().isSignUpByGoogle;
   }
 
-  void clearUser() {
-    _userBox.clear();
+  Future<int> clearUser() async {
+    var currentUser = getCurrentUser();
+    var userNums = await _userBox.clear();
+
+    if (currentUser.id.isNotEmpty) {
+      await login(currentUser);
+      return userNums - 1;
+    }
+
+    return userNums;
   }
 
   bool isLogin() {
-    return _userBox.get(LOCAL_USER_KEY) != null;
+    return _userBox.containsKey(CURRENT_LOGGED_USER);
   }
 
   Future<void> login(UserProfile userProfile) async {
-    await _userBox.put(LOCAL_USER_KEY, userProfile);
+    await _userBox.put(CURRENT_LOGGED_USER, userProfile);
+    var clonedUser = UserProfile.fromJson(userProfile.toJson());
+    await _addLoggedAccount(clonedUser);
+  }
+
+  List<UserProfile> getSwitchAccounts() {
+    var users = _userBox.toMap();
+    if (isLogin()) {
+      var currentUser = getCurrentUser();
+      users.remove(CURRENT_LOGGED_USER);
+      users.remove(currentUser.id);
+    }
+
+    return users.values.toList();
+  }
+
+  Future<void> _addLoggedAccount(UserProfile userProfile) async {
+    await _userBox.put(userProfile.id, userProfile);
   }
 
   Future<void> logout() async {
-    _userBox.delete(LOCAL_USER_KEY);
+    _userBox.delete(CURRENT_LOGGED_USER);
   }
 }
