@@ -211,7 +211,6 @@ class ImageGalleryPickerScreenState
       appBarTitle: "Pick an image",
       appBarAction: GestureDetector(
         onTap: () {
-          print("click");
           popTopDisplay();
         },
         child: Container(
