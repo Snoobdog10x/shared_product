@@ -16,8 +16,8 @@ class LocalSetting with RetrieveUserSettingEvent {
     if (userId != "") syncUserSetting(userId);
   }
 
-  void syncUserSetting(String userId) {
-    sendRetrieveUserSettingEvent(userId);
+  Future<void> syncUserSetting(String userId) async {
+    await sendRetrieveUserSettingEvent(userId);
   }
 
   Future<void> clearSetting() async {
