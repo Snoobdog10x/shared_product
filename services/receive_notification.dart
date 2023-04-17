@@ -20,6 +20,7 @@ class ReceiveNotification
   bool? _isGrantPermission = false;
   String _currentUserId = "";
   String _currentConversation = "";
+  bool isTurnOffNotification = false;
   Future<void> init(bool isWeb) async {
     if (isWeb) return;
 
@@ -36,8 +37,7 @@ class ReceiveNotification
 
   void setNotificationStream(String userId) {
     disposeStreamUserNotificationEvent();
-
-    if (userId == "" || _isGrantPermission != null || !_isGrantPermission!)
+    if (userId == "" || _isGrantPermission == null || !_isGrantPermission!)
       return;
     _currentUserId = userId;
     sendStreamUserNotificationEvent(userId);
