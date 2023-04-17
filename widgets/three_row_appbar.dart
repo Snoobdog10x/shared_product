@@ -4,11 +4,13 @@ class ThreeRowAppBar extends StatelessWidget {
   final Widget? firstWidget;
   final Widget? secondWidget;
   final Widget? lastWidget;
+  final double height;
   const ThreeRowAppBar({
     super.key,
     this.firstWidget,
     this.secondWidget,
     this.lastWidget,
+    this.height = 60,
   });
 
   @override
