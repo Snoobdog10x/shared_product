@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:hive/hive.dart';
 
 import '../../models/search_history/search_history.dart';
@@ -11,8 +13,7 @@ class LocalSearchHistory {
     if (!Hive.isAdapterRegistered(searchAdapter.typeId)) {
       Hive.registerAdapter(searchAdapter);
     }
-    if (userId != "")
-      _searchBox = await Hive.openBox("${SEARCH_HISTORY_BOX}_$userId");
+    _searchBox = await Hive.openBox("${SEARCH_HISTORY_BOX}_$userId");
   }
 
   Future<void> clear() async {
@@ -28,7 +29,12 @@ class LocalSearchHistory {
       await _searchBox.delete(searchHistory.searchText);
   }
 
-  List<SearchHistory> getSearchHistories() {
-    return _searchBox.values.toList();
+  List<SearchHistory> getSearchHistories({String searchText = ""}) {
+    if (searchText.isEmpty) return _searchBox.values.toList();
+    List<SearchHistory> searchResult = [];
+    _searchBox.values.toList().forEach((element) {
+      if (element.searchText.contains(searchText)) searchResult.add(element);
+    });
+    return searchResult;
   }
 }
