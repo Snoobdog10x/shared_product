@@ -13,9 +13,12 @@ class ImageGalleryPickerBloc
   List<AssetEntity> selectedImages = [];
   int page = 0;
   int limit = 10;
-  Future<void> initImage() async {
-    galleryImages =
-        await PhotoManager.getAssetListPaged(page: page, pageCount: limit);
+  Future<void> initImage(RequestType type) async {
+    galleryImages = await PhotoManager.getAssetListPaged(
+      page: page,
+      pageCount: limit,
+      type: type,
+    );
     notifyDataChanged();
   }
 

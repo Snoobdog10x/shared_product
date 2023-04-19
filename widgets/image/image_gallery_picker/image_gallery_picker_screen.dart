@@ -13,10 +13,12 @@ import '../../default_appbar.dart';
 class ImageGalleryPickerScreen extends StatefulWidget {
   final bool isPickMultiple;
   final void Function(List<XFile>)? onFileSelected;
+  final RequestType type;
   const ImageGalleryPickerScreen({
     super.key,
     this.isPickMultiple = true,
     this.onFileSelected,
+    this.type = RequestType.image,
   });
 
   @override
@@ -51,10 +53,22 @@ class ImageGalleryPickerScreenState
   Future<void> askPermission() async {
     final PermissionState _ps = await PhotoManager.requestPermissionExtend();
     if (_ps.isAuth) {
-      bloc.initImage();
+      bloc.initImage(widget.type);
+      return;
     } else {
-      // Limited(iOS) or Rejected, use `==` for more precise judgements.
-      // You can call `PhotoManager.openSetting()` to open settings for further steps.
+      showAlertDialog(
+        title: "Image permission",
+        content:
+            "We need your permission to get media from your device, please give us fully access",
+        confirm: () async {
+          popTopDisplay();
+          PhotoManager.openSetting();
+        },
+        cancel: () {
+          popTopDisplay();
+          popTopDisplay();
+        },
+      );
     }
   }
 
