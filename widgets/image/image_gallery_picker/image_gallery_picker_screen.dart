@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 import '../../../../generated/abstract_bloc.dart';
@@ -11,7 +12,7 @@ import '../../default_appbar.dart';
 
 class ImageGalleryPickerScreen extends StatefulWidget {
   final bool isPickMultiple;
-  final void Function(List<File?>)? onFileSelected;
+  final void Function(List<XFile>)? onFileSelected;
   const ImageGalleryPickerScreen({
     super.key,
     this.isPickMultiple = true,

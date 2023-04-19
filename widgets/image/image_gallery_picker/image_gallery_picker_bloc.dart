@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:image_picker/image_picker.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import '../../../../generated/abstract_bloc.dart';
@@ -18,13 +19,13 @@ class ImageGalleryPickerBloc
     notifyDataChanged();
   }
 
-  Future<List<File?>> getSelectedFiles() async {
+  Future<List<XFile>> getSelectedFiles() async {
     List<Future<File?>> getFile = [];
     selectedImages.forEach((element) {
-      getFile.add(element.originFile);
+      getFile.add(element.file);
     });
-
-    return await Future.wait(getFile);
+    var nonNullFile = (await Future.wait(getFile)).whereType<File>();
+    return nonNullFile.map((e) => XFile(e.path)).toList();
   }
 
   void onSelectImage(AssetEntity image) {

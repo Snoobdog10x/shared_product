@@ -1,16 +1,22 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
 enum File_Type { IMAGE, VIDEO }
 
 class CloudStorage {
-  Future<String> uploadFile(File_Type type, File file, String fileName) async {
+  Future<String> uploadFile(
+    XFile file,
+    String fileName, {
+    File_Type type = File_Type.IMAGE,
+  }) async {
     var refPath = _getRefPathFromFileType(type);
     final storageRef = FirebaseStorage.instance.ref(refPath);
     final fileRef = storageRef.child(fileName);
-    fileRef.putFile(file);
-    return await fileRef.getDownloadURL();
+    var data = await file.readAsBytes();
+    var upload = await fileRef.putData(data);
+    return await upload.ref.getDownloadURL();
   }
 
   Future<List<String>> getDownloadURLs() async {
