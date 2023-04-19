@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
 
 import '../../models/user_profile/user_profile.dart';
@@ -72,5 +74,6 @@ class LocalUser {
 
   Future<void> logout() async {
     _userBox.delete(CURRENT_LOGGED_USER);
+    FirebaseAuth.instance.signOut();
   }
 }
