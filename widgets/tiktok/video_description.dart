@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:readmore/readmore.dart';
 
+import '../../../screens/user/profile/profile_screen.dart';
+
 class VideoDescription extends StatelessWidget {
   final String username;
   final String videtoTitle;
   final String songInfo;
+  final Function? onTapUserName;
 
   VideoDescription({
     this.username = "",
     this.videtoTitle = "",
     this.songInfo = "",
+    this.onTapUserName,
   });
 
   @override
@@ -23,10 +27,17 @@ class VideoDescription extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            '@' + username,
-            style: TextStyle(
-                fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+          GestureDetector(
+            onTap: () {
+              onTapUserName?.call();
+            },
+            child: Text(
+              username,
+              style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
+            ),
           ),
           SizedBox(
             height: 7,
