@@ -135,7 +135,7 @@ class ActionsToolbar extends StatelessWidget {
       child: Stack(
         children: [
           _getProfilePicture(pictureUrl),
-          _getPlusIcon(),
+          if (!isFollow) _getPlusIcon(),
         ],
       ),
     );

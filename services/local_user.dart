@@ -46,6 +46,12 @@ class LocalUser {
     return _userBox.containsKey(CURRENT_LOGGED_USER);
   }
 
+  Future<void> switchAccount(UserProfile userProfile) async {
+    await logout();
+    await _userBox.delete(userProfile.id);
+    await login(userProfile);
+  }
+
   Future<void> login(UserProfile userProfile) async {
     await _userBox.put(CURRENT_LOGGED_USER, userProfile);
     var clonedUser = UserProfile.fromJson(userProfile.toJson());
