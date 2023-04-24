@@ -30,11 +30,6 @@ class LocalUser {
     return _currentProfile!;
   }
 
-  bool isUserSignUpByGoogle() {
-    if (!isLogin()) return false;
-    return getCurrentUser().isSignUpByGoogle;
-  }
-
   Future<int> clearUser() async {
     var currentUser = getCurrentUser();
     var userNums = await _userBox.clear();
