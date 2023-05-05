@@ -10,12 +10,14 @@ class VideoPlayerItem extends StatefulWidget {
   final bool isPlay;
   final bool isMute;
   final bool onTapPause;
+  final void Function()? loadDoneCallBack;
   const VideoPlayerItem({
     super.key,
     required this.videoUrl,
     this.isPlay = false,
     this.isMute = false,
     this.onTapPause = true,
+    this.loadDoneCallBack,
   });
 
   @override
@@ -93,7 +95,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
 
     _controller!.setLooping(true);
     await _controller!.initialize();
-
+    widget.loadDoneCallBack?.call();
     if (isMute) {
       _controller!.setVolume(0);
     }
