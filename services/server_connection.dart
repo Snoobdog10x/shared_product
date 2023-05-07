@@ -21,6 +21,11 @@ class ServerConnection extends AbstractService {
         .onValue
         .listen((event) {
       var isConnected = event.snapshot.value as bool;
+      if (isConnected)
+        print("connected");
+      else
+        print("disconnect");
+        
       _connectionChangeCallBack?.call(isConnected);
     });
   }
