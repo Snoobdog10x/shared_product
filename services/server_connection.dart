@@ -15,19 +15,20 @@ class ServerConnection extends AbstractService {
   }
 
   void init() {
-    _connectionStream = realtimeDatabase
-        .ref(".info")
-        .child("connected")
-        .onValue
-        .listen((event) {
-      var isConnected = event.snapshot.value as bool;
-      if (isConnected)
-        print("connected");
-      else
-        print("disconnect");
-        
-      _connectionChangeCallBack?.call(isConnected);
-    });
+    dispose();
+    try {
+      _connectionStream = realtimeDatabase
+          .ref(".info")
+          .child("connected")
+          .onValue
+          .listen((event) {
+        var isConnected = event.snapshot.value as bool;
+
+        _connectionChangeCallBack?.call(isConnected);
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
