@@ -3,26 +3,27 @@ import 'dart:convert';
 import 'package:reel_t/events/notification/stream_user_notification/stream_user_notification_event.dart';
 import 'package:reel_t/events/notification/update_notification/update_notification_event.dart';
 import 'package:platform_local_notifications/platform_local_notifications.dart';
+import 'package:reel_t/generated/abstract_service.dart';
 import 'package:reel_t/generated/app_init.dart';
 import 'package:reel_t/models/conversation/conversation.dart';
 import 'package:reel_t/models/user_profile/user_profile.dart';
-import 'package:reel_t/screens/messenger/detail_chat/detail_chat_screen.dart';
 
 import '../../generated/app_store.dart';
 import '../../models/notification/notification.dart';
 import '../../models/message/message.dart' as ms;
 
-class ReceiveNotification
+class ReceiveNotification extends AbstractService
     with StreamUserNotificationEvent, UpdateNotificationEvent {
   static String CONTACT_USER_KEY = "contact_user_key";
   static String NEW_MESSAGE_KEY = "new_message_key";
   static String PUSH_CONVERSATION_KEY = "push_conversation_key";
   bool? _isGrantPermission = false;
-  String _currentUserId = "";
   String _currentConversation = "";
   bool isTurnOffNotification = false;
-  Future<void> init(bool isWeb) async {
-    if (isWeb) return;
+  AppStore _appStore = AppInit.appStore;
+
+  Future<void> init() async {
+    if (_appStore.isWeb()) return;
 
     _isGrantPermission = await PlatformNotifier.I.requestPermissions();
   }
@@ -39,7 +40,6 @@ class ReceiveNotification
     disposeStreamUserNotificationEvent();
     if (userId == "" || _isGrantPermission == null || !_isGrantPermission!)
       return;
-    _currentUserId = userId;
     sendStreamUserNotificationEvent(userId);
   }
 
@@ -100,5 +100,10 @@ class ReceiveNotification
   @override
   void onUpdateNotificationEventDone(Notification updatedNotification) {
     // TODO: implement onUpdateNotificationEventDone
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
   }
 }

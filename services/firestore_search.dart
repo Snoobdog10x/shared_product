@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reel_t/generated/abstract_service.dart';
 
-class FirestoreSearch {
+class FirestoreSearch extends AbstractService{
   String? _prevSearchText = null;
   QueryDocumentSnapshot<Map<String, dynamic>>? _lastSnapshot;
   final _db = FirebaseFirestore.instance;
@@ -70,5 +71,15 @@ class FirestoreSearch {
     if (searchResults.docs.isNotEmpty) _lastSnapshot = searchResults.docs.last;
 
     return searchResults;
+  }
+  
+  @override
+  void dispose() {
+    // TODO: implement dispose
+  }
+  
+  @override
+  void init() {
+    // TODO: implement init
   }
 }

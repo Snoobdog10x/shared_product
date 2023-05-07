@@ -1,14 +1,19 @@
 import 'dart:math';
 
 import 'package:hive/hive.dart';
+import 'package:reel_t/generated/abstract_service.dart';
+import 'package:reel_t/generated/app_init.dart';
+import 'package:reel_t/generated/app_store.dart';
 
 import '../../models/search_history/search_history.dart';
 import '../../models/user_profile/user_profile.dart';
 
-class LocalSearchHistory {
+class LocalSearchHistory extends AbstractService {
   late Box<SearchHistory> _searchBox;
   String SEARCH_HISTORY_BOX = SearchHistory.PATH;
-  Future<void> init(String userId) async {
+  AppStore _appStore = AppInit.appStore;
+  Future<void> init() async {
+    var userId = _appStore.localUser.getCurrentUser().id;
     var searchAdapter = SearchHistoryAdapter();
     if (!Hive.isAdapterRegistered(searchAdapter.typeId)) {
       Hive.registerAdapter(searchAdapter);
@@ -36,5 +41,10 @@ class LocalSearchHistory {
       if (element.searchText.contains(searchText)) searchResult.add(element);
     });
     return searchResult;
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
   }
 }

@@ -1,6 +1,7 @@
+import 'package:reel_t/generated/abstract_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LocalStorage {
+class LocalStorage extends AbstractService{
   static final String SIGNED_IN_USER_CACHE_KEY = "sign_in_user";
   static final String CONVERSATIONS_KEY = "conversations_key";
   SharedPreferences? _preferences;
@@ -43,5 +44,10 @@ class LocalStorage {
   void removeCache(String key) {
     if (_preferences == null) return;
     _preferences!.remove(key);
+  }
+  
+  @override
+  void dispose() {
+    // TODO: implement dispose
   }
 }

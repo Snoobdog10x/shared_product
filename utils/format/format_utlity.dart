@@ -15,6 +15,7 @@ class FormatUtility {
     ;
     DateTime date2AddWeek =
         DateTime(date2.millisecondsSinceEpoch).add(Duration(days: 6));
+        
     int weekNumber1 = date1.weekday == DateTime.sunday
         ? date1.difference(date1AddWeek).inDays ~/ 7
         : date1.weekday - 1;

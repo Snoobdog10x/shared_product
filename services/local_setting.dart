@@ -1,11 +1,16 @@
 import 'package:hive/hive.dart';
 import 'package:reel_t/events/setting/retrieve_user_setting/retrieve_user_setting_event.dart';
+import 'package:reel_t/generated/abstract_service.dart';
+import 'package:reel_t/generated/app_init.dart';
+import 'package:reel_t/generated/app_store.dart';
 import 'package:reel_t/models/setting/setting.dart';
 
-class LocalSetting with RetrieveUserSettingEvent {
+class LocalSetting extends AbstractService with RetrieveUserSettingEvent {
   late Box<Setting> _settingBox;
   String SETTING_PATH = Setting.PATH;
-  Future<void> init(String userId) async {
+  AppStore _appStore = AppInit.appStore;
+  Future<void> init() async {
+    var userId = _appStore.localUser.getCurrentUser().id;
     var settingAdapter = SettingAdapter();
     if (!Hive.isAdapterRegistered(settingAdapter.typeId)) {
       Hive.registerAdapter(settingAdapter);
@@ -24,7 +29,7 @@ class LocalSetting with RetrieveUserSettingEvent {
       await _settingBox.clear();
       return;
     }
-    
+
     await _settingBox.delete(userId);
   }
 
@@ -41,5 +46,10 @@ class LocalSetting with RetrieveUserSettingEvent {
   @override
   void onRetrieveUserSettingEventDone(Setting? setting) {
     if (setting != null) setUserSetting(setting);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
   }
 }

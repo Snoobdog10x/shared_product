@@ -3,10 +3,11 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
+import 'package:reel_t/generated/abstract_service.dart';
 
 import '../../models/user_profile/user_profile.dart';
 
-class LocalUser {
+class LocalUser extends AbstractService{
   UserProfile? _currentProfile;
   late Box<UserProfile> _userBox;
   String USER_PATH = UserProfile.PATH;
@@ -76,5 +77,10 @@ class LocalUser {
   Future<void> logout() async {
     _userBox.delete(CURRENT_LOGGED_USER);
     FirebaseAuth.instance.signOut();
+  }
+  
+  @override
+  void dispose() {
+    // TODO: implement dispose
   }
 }

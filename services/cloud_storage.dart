@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../generated/abstract_service.dart';
+
 enum File_Type { IMAGE, VIDEO }
 
-class CloudStorage {
+class CloudStorage extends AbstractService{
   Future<String> uploadFile(
     XFile file,
     String fileName, {
@@ -29,5 +31,15 @@ class CloudStorage {
   String _getRefPathFromFileType(File_Type file_type) {
     var fileTypeName = file_type.name.toLowerCase();
     return "${fileTypeName}s";
+  }
+  
+  @override
+  void dispose() {
+    // TODO: implement dispose
+  }
+  
+  @override
+  void init() {
+    // TODO: implement init
   }
 }
