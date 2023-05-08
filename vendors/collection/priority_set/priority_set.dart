@@ -13,6 +13,10 @@ class PrioritySet<T> {
     _data.sort(comparison);
   }
 
+  int length() => _data.length;
+
+  bool contains(T item) => _data.contains(item);
+
   void addAll(Iterable<T> objectList) {
     objectList.forEach((object) {
       _data.remove(object);
