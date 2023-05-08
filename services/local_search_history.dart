@@ -11,6 +11,8 @@ import '../../models/user_profile/user_profile.dart';
 class LocalSearchHistory extends AbstractService {
   late Box<SearchHistory> _searchBox;
   String SEARCH_HISTORY_BOX = SearchHistory.PATH;
+  AppStore appStore = AppInit.appStore;
+
   Future<void> init() async {
     var userId = appStore.localUser.getCurrentUser().id;
     var searchAdapter = SearchHistoryAdapter();
