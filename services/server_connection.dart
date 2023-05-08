@@ -8,7 +8,6 @@ import 'package:reel_t/generated/app_store.dart';
 class ServerConnection extends AbstractService {
   StreamSubscription<DatabaseEvent>? _connectionStream;
   final realtimeDatabase = FirebaseDatabase.instance;
-  AppStore _appStore = AppInit.appStore;
   void Function(bool isConnected)? _connectionChangeCallBack;
   void setCallBack(void Function(bool isConnected) _connectionChangeCallBack) {
     this._connectionChangeCallBack = _connectionChangeCallBack;
@@ -20,7 +19,7 @@ class ServerConnection extends AbstractService {
       _connectionStream = realtimeDatabase
           .ref(".info")
           .child("connected")
-          .onValue
+          .onChildChanged
           .listen((event) {
         var isConnected = event.snapshot.value as bool;
 
