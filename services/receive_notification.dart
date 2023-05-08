@@ -20,10 +20,9 @@ class ReceiveNotification extends AbstractService
   bool? _isGrantPermission = false;
   String _currentConversation = "";
   bool isTurnOffNotification = false;
-  AppStore _appStore = AppInit.appStore;
 
   Future<void> init() async {
-    if (_appStore.isWeb()) return;
+    if (appStore.isWeb()) return;
 
     _isGrantPermission = await PlatformNotifier.I.requestPermissions();
   }

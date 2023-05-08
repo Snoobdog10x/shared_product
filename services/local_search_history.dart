@@ -11,9 +11,8 @@ import '../../models/user_profile/user_profile.dart';
 class LocalSearchHistory extends AbstractService {
   late Box<SearchHistory> _searchBox;
   String SEARCH_HISTORY_BOX = SearchHistory.PATH;
-  AppStore _appStore = AppInit.appStore;
   Future<void> init() async {
-    var userId = _appStore.localUser.getCurrentUser().id;
+    var userId = appStore.localUser.getCurrentUser().id;
     var searchAdapter = SearchHistoryAdapter();
     if (!Hive.isAdapterRegistered(searchAdapter.typeId)) {
       Hive.registerAdapter(searchAdapter);

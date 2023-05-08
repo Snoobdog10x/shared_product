@@ -8,9 +8,9 @@ import 'package:reel_t/models/setting/setting.dart';
 class LocalSetting extends AbstractService with RetrieveUserSettingEvent {
   late Box<Setting> _settingBox;
   String SETTING_PATH = Setting.PATH;
-  AppStore _appStore = AppInit.appStore;
+
   Future<void> init() async {
-    var userId = _appStore.localUser.getCurrentUser().id;
+    var userId = appStore.localUser.getCurrentUser().id;
     var settingAdapter = SettingAdapter();
     if (!Hive.isAdapterRegistered(settingAdapter.typeId)) {
       Hive.registerAdapter(settingAdapter);
