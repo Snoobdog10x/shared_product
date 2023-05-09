@@ -29,7 +29,7 @@ class DefaultAppBar extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Align(
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.center,
               child: onTapBackButton == null
                   ? Container()
                   : GestureDetector(
