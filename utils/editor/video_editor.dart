@@ -28,7 +28,7 @@ class VideoEditor {
 
     final info = await VideoCompress.compressVideo(
       video.path,
-      quality: VideoQuality.Res640x480Quality,
+      quality: VideoQuality.Res1280x720Quality,
       deleteOrigin: false,
       includeAudio: true,
     );
