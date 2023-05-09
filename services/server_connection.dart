@@ -19,10 +19,9 @@ class ServerConnection extends AbstractService {
       _connectionStream = realtimeDatabase
           .ref(".info")
           .child("connected")
-          .onChildChanged
+          .onValue
           .listen((event) {
         var isConnected = event.snapshot.value as bool;
-
         _connectionChangeCallBack?.call(isConnected);
       });
     } catch (e) {
