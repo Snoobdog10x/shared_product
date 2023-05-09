@@ -19,13 +19,17 @@ class LocalSetting extends AbstractService with RetrieveUserSettingEvent {
 
     _settingBox = await Hive.openBox(SETTING_PATH);
     if (userId != "") syncUserSetting(userId);
+    isInitialized = true;
   }
 
   Future<void> syncUserSetting(String userId) async {
+    if (!isInitialized) return;
+
     await sendRetrieveUserSettingEvent(userId);
   }
 
   Future<void> clearSetting({String? userId}) async {
+    if (!isInitialized) return;
     if (userId == null) {
       await _settingBox.clear();
       return;
@@ -35,10 +39,12 @@ class LocalSetting extends AbstractService with RetrieveUserSettingEvent {
   }
 
   Future<void> setUserSetting(Setting userSetting) async {
+    if (!isInitialized) return;
     await _settingBox.put(userSetting.userId, userSetting);
   }
 
   Future<Setting?> getUserSetting(String userId) async {
+    if (!isInitialized) return null;
     var userSetting = _settingBox.get(userId);
 
     return userSetting;
@@ -46,6 +52,7 @@ class LocalSetting extends AbstractService with RetrieveUserSettingEvent {
 
   @override
   void onRetrieveUserSettingEventDone(Setting? setting) {
+    if (!isInitialized) return;
     if (setting != null) setUserSetting(setting);
   }
 

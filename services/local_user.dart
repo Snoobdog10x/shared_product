@@ -7,7 +7,7 @@ import 'package:reel_t/generated/abstract_service.dart';
 
 import '../../models/user_profile/user_profile.dart';
 
-class LocalUser extends AbstractService{
+class LocalUser extends AbstractService {
   UserProfile? _currentProfile;
   late Box<UserProfile> _userBox;
   String USER_PATH = UserProfile.PATH;
@@ -19,9 +19,12 @@ class LocalUser extends AbstractService{
     }
 
     _userBox = await Hive.openBox(USER_PATH);
+    isInitialized = true;
   }
 
   UserProfile getCurrentUser() {
+    var guest = UserProfile(fullName: "Guest");
+    if (!isInitialized) return guest;
     if (!isLogin()) {
       _currentProfile = UserProfile(fullName: "Guest");
       return _currentProfile!;
@@ -32,6 +35,8 @@ class LocalUser extends AbstractService{
   }
 
   Future<int> clearUser() async {
+    if (!isInitialized) return 0;
+
     var currentUser = getCurrentUser();
     var userNums = await _userBox.clear();
 
@@ -44,22 +49,30 @@ class LocalUser extends AbstractService{
   }
 
   bool isLogin() {
+    if (!isInitialized) return false;
+
     return _userBox.containsKey(CURRENT_LOGGED_USER);
   }
 
   Future<void> switchAccount(UserProfile userProfile) async {
+    if (!isInitialized) return;
+
     await logout();
     await _userBox.delete(userProfile.id);
     await login(userProfile);
   }
 
   Future<void> login(UserProfile userProfile) async {
+    if (!isInitialized) return;
+
     await _userBox.put(CURRENT_LOGGED_USER, userProfile);
     var clonedUser = UserProfile.fromJson(userProfile.toJson());
     await _addLoggedAccount(clonedUser);
   }
 
   List<UserProfile> getSwitchAccounts() {
+    if (!isInitialized) return [];
+
     var users = _userBox.toMap();
     if (isLogin()) {
       var currentUser = getCurrentUser();
@@ -71,14 +84,18 @@ class LocalUser extends AbstractService{
   }
 
   Future<void> _addLoggedAccount(UserProfile userProfile) async {
+    if (!isInitialized) return;
+
     await _userBox.put(userProfile.id, userProfile);
   }
 
   Future<void> logout() async {
+    if (!isInitialized) return;
+
     _userBox.delete(CURRENT_LOGGED_USER);
     FirebaseAuth.instance.signOut();
   }
-  
+
   @override
   void dispose() {
     // TODO: implement dispose

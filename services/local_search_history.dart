@@ -19,23 +19,30 @@ class LocalSearchHistory extends AbstractService {
     if (!Hive.isAdapterRegistered(searchAdapter.typeId)) {
       Hive.registerAdapter(searchAdapter);
     }
+
     _searchBox = await Hive.openBox("${SEARCH_HISTORY_BOX}_$userId");
+    isInitialized = true;
   }
 
   Future<void> clear() async {
+    if (!isInitialized) return;
     await _searchBox.clear();
   }
 
   Future<void> addSearchHistory(SearchHistory searchHistory) async {
+    if (!isInitialized) return;
     await _searchBox.put(searchHistory.searchText, searchHistory);
   }
 
   Future<void> removeSearchHistory(SearchHistory searchHistory) async {
+    if (!isInitialized) return;
     if (_searchBox.containsKey(searchHistory.searchText))
       await _searchBox.delete(searchHistory.searchText);
+    await _searchBox.delete(searchHistory.searchText);
   }
 
   List<SearchHistory> getSearchHistories({String searchText = ""}) {
+    if (!isInitialized) return [];
     if (searchText.isEmpty) return _searchBox.values.toList();
     List<SearchHistory> searchResult = [];
     _searchBox.values.toList().forEach((element) {
@@ -45,7 +52,5 @@ class LocalSearchHistory extends AbstractService {
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-  }
+  void dispose() {}
 }

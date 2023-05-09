@@ -24,6 +24,7 @@ class ServerConnection extends AbstractService {
         var isConnected = event.snapshot.value as bool;
         _connectionChangeCallBack?.call(isConnected);
       });
+      isInitialized = true;
     } catch (e) {
       print(e);
     }

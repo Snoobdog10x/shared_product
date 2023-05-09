@@ -26,17 +26,21 @@ class ReceiveNotification extends AbstractService
     if (appStore.isWeb()) return;
 
     _isGrantPermission = await PlatformNotifier.I.requestPermissions();
+    isInitialized = true;
   }
 
   void turnOnNotification(String conversationId) {
+    if (!isInitialized) return;
     _currentConversation = conversationId;
   }
 
   void turnOffNotification() {
+    if (!isInitialized) return;
     _currentConversation = "";
   }
 
   void setNotificationStream(String userId) {
+    if (!isInitialized) return;
     disposeStreamUserNotificationEvent();
     if (userId == "" || _isGrantPermission == null || !_isGrantPermission!)
       return;
@@ -56,6 +60,7 @@ class ReceiveNotification extends AbstractService
   }
 
   String _getContent(Notification notification) {
+    if (!isInitialized) return "";
     if (notification.notificationType == NotificationType.NEW_MESSAGE.name) {
       Map<String, dynamic> detailMessage =
           json.decode(notification.notificationContent);
@@ -67,6 +72,7 @@ class ReceiveNotification extends AbstractService
   }
 
   String _getTitle(Notification notification) {
+    if (!isInitialized) return "";
     if (notification.notificationType == NotificationType.NEW_MESSAGE.name) {
       Map<String, dynamic> detailMessage =
           json.decode(notification.notificationContent);
@@ -78,6 +84,7 @@ class ReceiveNotification extends AbstractService
   }
 
   Future<void> _showMessage(Notification notification) async {
+    if (!isInitialized) return;
     var title = _getTitle(notification);
     var content = _getContent(notification);
     Map<String, dynamic> detailMessage =

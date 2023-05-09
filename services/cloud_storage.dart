@@ -7,7 +7,7 @@ import '../../generated/abstract_service.dart';
 
 enum File_Type { IMAGE, VIDEO }
 
-class CloudStorage extends AbstractService{
+class CloudStorage extends AbstractService {
   Future<String> uploadFile(
     XFile file,
     String fileName, {
@@ -32,14 +32,14 @@ class CloudStorage extends AbstractService{
     var fileTypeName = file_type.name.toLowerCase();
     return "${fileTypeName}s";
   }
-  
+
   @override
   void dispose() {
     // TODO: implement dispose
   }
-  
+
   @override
   void init() {
-    // TODO: implement init
+    isInitialized = true;
   }
 }
