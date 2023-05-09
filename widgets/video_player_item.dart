@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -11,6 +13,7 @@ class VideoPlayerItem extends StatefulWidget {
   final bool isMute;
   final bool onTapPause;
   final void Function()? loadDoneCallBack;
+  final bool isNetworkVideo;
   const VideoPlayerItem({
     super.key,
     required this.videoUrl,
@@ -18,6 +21,7 @@ class VideoPlayerItem extends StatefulWidget {
     this.isMute = false,
     this.onTapPause = true,
     this.loadDoneCallBack,
+    this.isNetworkVideo = true,
   });
 
   @override
@@ -87,8 +91,11 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
     if (_controller != null && _controller!.value.isInitialized) {
       return;
     }
+    if (widget.isNetworkVideo)
+      _controller = VideoPlayerController.network(widget.videoUrl);
+    else
+      _controller = VideoPlayerController.file(File(widget.videoUrl));
 
-    _controller = VideoPlayerController.network(widget.videoUrl);
     _controller!.addListener(() {
       notifyDataChanged();
     });
